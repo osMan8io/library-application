@@ -35,6 +35,11 @@ public class LibraryService implements Searchable {
     }
 
     public Book addBook(Book book) {
+
+        if (book.getTitle().isEmpty() || book.getAuthor().isEmpty()) {
+            throw new IllegalArgumentException("Book title or author cannot be empty");
+        }
+
         book.setId(nextId++);
         books.add(book);
         return book;
@@ -58,6 +63,14 @@ public class LibraryService implements Searchable {
     }
 
     public Book updateBook(int bookId, Book book) {
+
+        if (book.getTitle().isEmpty() || book.getAuthor().isEmpty()) {
+            throw new IllegalArgumentException("Book title or author cannot be empty");
+        }
+
+        if (!book.getCategory().equals(Category.values()[book.getCategory().ordinal()])) {
+            throw new IllegalArgumentException("Book category does not match please choose from category" + book.getCategory());
+        }
 
         Book updatedBook = null;
         for (int i = 0; i < books.size(); i++) {
