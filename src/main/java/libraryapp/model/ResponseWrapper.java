@@ -30,4 +30,10 @@ public class ResponseWrapper {
         this.success = true;
     }
 
+    public ResponseWrapper(Integer code, boolean success, String message, Object data) {
+        this.code = code;
+        this.success = success;
+        this.message = message;
+        this.data = data;
+    }
 }

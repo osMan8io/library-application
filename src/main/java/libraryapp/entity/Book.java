@@ -14,6 +14,7 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Id;
+import java.util.Arrays;
 
 @Entity
 @Getter
@@ -31,7 +32,11 @@ public class Book {
 
     @JsonProperty("category") // handles input case sensitivity for Json values
     public void setCategoryFromString(String category) {
-        this.category = Category.valueOf(category.trim().toUpperCase());
+        try {
+            this.category = Category.valueOf(category.trim().toUpperCase());
+        } catch (IllegalArgumentException | NullPointerException e) {
+            throw new IllegalArgumentException("Invalid category: " + category + ". Valid values are: " + Arrays.toString(Category.values()));
+        }
     }
 
     @JsonGetter("category") // to retrieve again category in all api response

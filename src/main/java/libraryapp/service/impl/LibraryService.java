@@ -36,8 +36,8 @@ public class LibraryService implements Searchable {
 
     public Book addBook(Book book) {
 
-        if (book.getTitle().isEmpty() || book.getAuthor().isEmpty()) {
-            throw new IllegalArgumentException("Book title or author cannot be empty");
+        if (book.getTitle().trim().isEmpty() || book.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException();
         }
 
         book.setId(nextId++);
@@ -48,11 +48,17 @@ public class LibraryService implements Searchable {
     public Book removeBook(int bookId) {
         Book deletedBook = null;
 
+        if (bookId <= 0 || bookId > books.size()) {
+            throw new IllegalArgumentException();
+        }
+
         for (int i = 0; i < books.size(); i++) {
             if (Objects.equals(books.get(i).getId(), bookId)) {
                 deletedBook = books.get(i);
                 books.remove(i);
                 break;
+            } else {
+                throw new IllegalArgumentException();
             }
         }
         return deletedBook;
@@ -64,22 +70,12 @@ public class LibraryService implements Searchable {
 
     public Book updateBook(int bookId, Book book) {
 
-        if (book.getTitle().isEmpty() || book.getAuthor().isEmpty()) {
-            throw new IllegalArgumentException("Book title or author cannot be empty");
-        }
-
-        if (!book.getCategory().equals(Category.values()[book.getCategory().ordinal()])) {
-            throw new IllegalArgumentException("Book category does not match please choose from category" + book.getCategory());
+        if (book.getTitle().trim().isEmpty() || book.getAuthor().trim().isEmpty()) {
+            throw new IllegalArgumentException();
         }
 
         Book updatedBook = null;
         for (int i = 0; i < books.size(); i++) {
-            /*if (books.get(i).getId() == bookId) {
-                updatedTitle = books.get(i).getTitle();
-                updatedId = books.get(i).getId();
-                updatedAuthor = books.get(i).getAuthor();
-                updatedCategory = books.get(i).getCategory();
-                break;*/
             if (books.get(i).getId() == bookId) {
                 books.get(i).setTitle(book.getTitle());
                 books.get(i).setAuthor(book.getAuthor());
@@ -93,41 +89,41 @@ public class LibraryService implements Searchable {
 
     @Override
     public Book searchByTitle(String title) {
-        Book foundBook = null;
 
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getTitle().trim().equalsIgnoreCase(title)) {
-                foundBook = books.get(i);
-            }
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Title cannot be null or empty");
         }
 
-        return foundBook;
+        return books.stream()
+                .filter(book -> book.getTitle().equalsIgnoreCase(title))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No book found with title: " + title));
     }
 
     @Override
     public Book searchByAuthor(String author) {
 
-        Book foundBook = null;
-
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getAuthor().trim().equalsIgnoreCase(author)) {
-                foundBook = books.get(i);
-            }
+        if (author == null || author.trim().isEmpty()) {
+            throw new IllegalArgumentException("Author cannot be null or empty");
         }
-
-        return foundBook;
+        return books.stream()
+                .filter(book -> book.getAuthor().equalsIgnoreCase(author))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No book found with author: " + author));
     }
 
     @Override
     public Book searchById(int bookId) {
 
-        Book foundBook = null;
-        for (int i = 0; i < books.size(); i++) {
-            if (books.get(i).getId() == bookId) {
-                foundBook = books.get(i);
-            }
+        if (bookId <= 0) {
+            throw new IllegalArgumentException("Invalid book id");
         }
-        return foundBook;
+
+        return books.stream()
+                .filter(book -> book.getId() == bookId)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("No book found with id: " + bookId));
+
     }
 
     @Override
