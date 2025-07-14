@@ -1,22 +1,19 @@
 package libraryapp.controller;
 
+import libraryapp.dto.BookDTO;
 import libraryapp.entity.Book;
-import libraryapp.enums.Category;
 import libraryapp.model.ResponseWrapper;
 import libraryapp.service.impl.LibraryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/book")
-public class BookConfig {
+public class BookController {
 
     private final LibraryService libraryService;
 
-    public BookConfig(LibraryService libraryService) {
+    public BookController(LibraryService libraryService) {
         this.libraryService = libraryService;
     }
 
@@ -31,43 +28,29 @@ public class BookConfig {
     }
 
     @PostMapping
-    public ResponseEntity<ResponseWrapper> addBook(@RequestBody Book book) { // without @RequestBody can not add data via JSON.
-            try {
+    public ResponseEntity<ResponseWrapper> addBook(@RequestBody BookDTO bookDTO) { // without @RequestBody can not add data via JSON.
                 return ResponseEntity.ok(ResponseWrapper.builder()
                         .code(200)
                         .success(true)
                         .message("Book is successfully added")
-                        .data(libraryService.addBook(book))
+                        .data(libraryService.addBook(bookDTO))
                         .build());
-            } catch (IllegalArgumentException e) {
-                return ResponseEntity.badRequest().body(ResponseWrapper.builder()
-                        .code(400)
-                        .success(false)
-                        .message("Title/Author can not be empty")
-                        .build());
-            }
+
     }
 
     @DeleteMapping("/remove/{bookId}")
-    public ResponseEntity<ResponseWrapper> removeBook(@PathVariable("bookId") int bookId) {
-        try {
+    public ResponseEntity<ResponseWrapper> removeBook(@PathVariable("bookId") Long bookId) {
+
             return ResponseEntity.ok(ResponseWrapper.builder()
                     .code(200)
                     .success(true)
                     .message("Book is successfully deleted")
                     .data(libraryService.removeBook(bookId))
                     .build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(ResponseWrapper.builder()
-                    .code(400)
-                    .success(false)
-                    .message("Invalid book id")
-                    .build());
-        }
     }
 
     @PutMapping("/update/{bookId}")
-    public ResponseEntity<ResponseWrapper> updateBook(@PathVariable("bookId") int bookId,@RequestBody Book book) {
+    public ResponseEntity<ResponseWrapper> updateBook(@PathVariable("bookId") Long bookId,@RequestBody BookDTO book) {
             return ResponseEntity.ok(ResponseWrapper.builder()
                     .code(200)
                     .success(true)
@@ -78,7 +61,7 @@ public class BookConfig {
     }
 
     @GetMapping("/id/{bookId}")
-    public ResponseEntity<ResponseWrapper> getBookById(@PathVariable("bookId") int bookId) {
+    public ResponseEntity<ResponseWrapper> getBookById(@PathVariable("bookId") Long bookId) {
             return ResponseEntity.ok(ResponseWrapper.builder()
                     .code(200)
                     .success(true)
@@ -105,27 +88,19 @@ public class BookConfig {
                     .code(200)
                     .success(true)
                     .message("Book is successfully retrieved")
-                    .data(libraryService.searchByAuthor(author))
+                    .data(libraryService.searchByAuthor(author.trim().toLowerCase()))
                     .build());
 
     }
 
     @GetMapping("/category/{category}")
     public ResponseEntity<ResponseWrapper> getBookByCategory(@PathVariable("category") String category) {
-        try {
             return ResponseEntity.ok(ResponseWrapper.builder()
                     .code(200)
                     .success(true)
                     .message("Books are successfully retrieved")
                     .data(libraryService.searchByCategory(category))
                     .build());
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().body(ResponseWrapper.builder()
-                    .code(400)
-                    .success(false)
-                    .message("Invalid category")
-                    .build());
-        }
     }
 
 }

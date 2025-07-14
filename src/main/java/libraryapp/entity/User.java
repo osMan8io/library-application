@@ -1,13 +1,15 @@
 package libraryapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import jakarta.persistence.Entity;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
+
 import java.util.List;
 
 @Entity
@@ -15,9 +17,11 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class User{
-    @Id
-    private int id;
+//tells Jackson to ignore the lazy-loading handler fields during serialization.
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+@Table(name = "app_user") // Renamed to avoid conflict
+public class User extends BaseEntity {
+
     private String username;
     private String password;
     @OneToMany
