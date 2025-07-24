@@ -1,0 +1,19 @@
+<!-- fragments/form-fragment.html -->
+<div th:fragment="book-form-fields">
+    <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <input type="text" th:field="*{title}" class="form-control" id="title" required>
+    </div>
+    <div class="mb-3">
+        <label for="author" class="form-label">Author</label>
+        <input type="text" th:field="*{author}" class="form-control" id="author" required>
+    </div>
+    <div class="mb-3">
+        <label for="category" class="form-label">Category</label>
+        <select  th:field="*{category}" class="form-control" id="category">
+            <option value="" selected hidden>Select</option>
+            <option th:each="cat : ${T(libraryapp.enums.Category).values()}"
+                    th:value="${cat}" th:text="${cat}">Category</option>
+        </select>
+    </div>
+</div>

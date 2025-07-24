@@ -21,7 +21,7 @@ public class BookDTO {
 /* if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
    throw new IllegalArgumentException("Title must not be blank");
  }*/
-    @NotBlank(message = "Title is required")
+    @NotBlank(message= "Title is required")
     private String title;
     @NotBlank(message = "Author is required")
     private String author;

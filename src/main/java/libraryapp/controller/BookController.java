@@ -1,14 +1,15 @@
 package libraryapp.controller;
 
 import libraryapp.dto.BookDTO;
-import libraryapp.entity.Book;
 import libraryapp.model.ResponseWrapper;
 import libraryapp.service.impl.LibraryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/v1/book")
+@Controller
+@RequestMapping("/")
 public class BookController {
 
     private final LibraryService libraryService;
@@ -18,49 +19,43 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<ResponseWrapper> retrieveAllBooks() {
-        return ResponseEntity.ok(ResponseWrapper.builder()
-                .code(200)
-                .success(true)
-                .message("All books are retrieved")
-                .data(libraryService.getAllBooks())
-                .build());
+    public String retrieveAllBooks(Model model) {
+        model.addAttribute("books", libraryService.getAllBooks());
+        return "book/book-list";
     }
 
-    @PostMapping
-    public ResponseEntity<ResponseWrapper> addBook(@RequestBody BookDTO bookDTO) { // without @RequestBody can not add data via JSON.
-                return ResponseEntity.ok(ResponseWrapper.builder()
-                        .code(200)
-                        .success(true)
-                        .message("Book is successfully added")
-                        .data(libraryService.addBook(bookDTO))
-                        .build());
-
+    @GetMapping("/add")
+    public String addBook(Model model) {
+        model.addAttribute("book", new BookDTO());
+        return "book/book-add";
     }
 
-    @DeleteMapping("/remove/{bookId}")
-    public ResponseEntity<ResponseWrapper> removeBook(@PathVariable("bookId") Long bookId) {
-
-            return ResponseEntity.ok(ResponseWrapper.builder()
-                    .code(200)
-                    .success(true)
-                    .message("Book is successfully deleted")
-                    .data(libraryService.removeBook(bookId))
-                    .build());
+    @PostMapping("/add")
+    public String addBook(BookDTO bookDTO) { // without @RequestBody can not add data via JSON.
+        libraryService.addBook(bookDTO);
+        return "redirect:/";
     }
 
-    @PutMapping("/update/{bookId}")
-    public ResponseEntity<ResponseWrapper> updateBook(@PathVariable("bookId") Long bookId,@RequestBody BookDTO book) {
-            return ResponseEntity.ok(ResponseWrapper.builder()
-                    .code(200)
-                    .success(true)
-                    .message("Book is successfully updated")
-                    .data(libraryService.updateBook(bookId,book))
-                    .build());
-
+    @GetMapping("/remove/{bookId}")
+    public String removeBook(@PathVariable Long bookId, Model model) {
+        libraryService.removeBook(bookId);
+        return "redirect:/";
     }
 
-    @GetMapping("/id/{bookId}")
+    @GetMapping("/update/{bookId}")
+    public String updateBook(@PathVariable("bookId") Long bookId, Model model) {
+        model.addAttribute("book", libraryService.searchById(bookId));
+        return "book/book-edit";
+    }
+
+    @PostMapping("/update/{bookId}") // in order to update in UI side we don't have to use put mapping
+    public String updateBook(@PathVariable("bookId") Long bookId, BookDTO bookDTO, Model model) {
+        libraryService.searchById(bookId);
+        model.addAttribute("book", libraryService.updateBook(bookId, bookDTO));
+        return "redirect:/";
+    }
+
+/*    @GetMapping("/id/{bookId}")
     public ResponseEntity<ResponseWrapper> getBookById(@PathVariable("bookId") Long bookId) {
             return ResponseEntity.ok(ResponseWrapper.builder()
                     .code(200)
@@ -101,6 +96,6 @@ public class BookController {
                     .message("Books are successfully retrieved")
                     .data(libraryService.searchByCategory(category))
                     .build());
-    }
+    }*/
 
 }

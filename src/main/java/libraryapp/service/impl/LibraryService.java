@@ -6,7 +6,6 @@ import libraryapp.enums.Category;
 import libraryapp.mapper.MapperUtil;
 import libraryapp.repository.BookRepository;
 import libraryapp.service.BookService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -15,8 +14,8 @@ import java.util.List;
 @Service
 public class LibraryService implements BookService {
 
-    @Autowired
-    BookRepository bookRepository;
+    private final BookRepository bookRepository;
+
     private final MapperUtil mapperUtil;
 
     public LibraryService(BookRepository bookRepository, MapperUtil mapperUtil) {
@@ -32,14 +31,14 @@ public class LibraryService implements BookService {
         return bookRepository.save(mapperUtil.convert(bookDTO, Book.class));
     }
 
-    public Long removeBook(Long bookId) {
+    public void removeBook(Long bookId) {
         if (!bookRepository.existsById(bookId)) throw new IllegalArgumentException("Book is not exist");
         bookRepository.deleteById(bookId);
-        return bookId;
     }
 
     public List<Book> getAllBooks() {
-        return bookRepository.findAll();
+        return bookRepository.findAllOrderByIdAsc();
+        // returns data in ascending order
     }
 
     public Book updateBook(Long bookId, BookDTO bookDTO) {
@@ -77,10 +76,5 @@ public class LibraryService implements BookService {
         return bookRepository.findByCategory(Category.valueOf(category.toUpperCase()));
     }
 
-    @Override
-    public List<Book> searchAllBooksByAuthor(String author) {
-        if (author == null || author.trim().isEmpty()) throw new IllegalArgumentException("Author cannot be null or empty");
-        return bookRepository.findAllByAuthorContainingIgnoreCase(author);
-    }
 
 }
