@@ -10,5 +10,5 @@ public interface BookService {
     List<Book> searchByAuthor(String author);
     Book searchById(Long id);
     List<Book> searchByCategory(String category);
-
+    List<Book> getAvailableBooks();
 }

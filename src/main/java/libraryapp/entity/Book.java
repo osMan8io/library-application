@@ -1,9 +1,7 @@
 package libraryapp.entity;
 
 import com.fasterxml.jackson.annotation.*;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import jakarta.persistence.*;
 import libraryapp.enums.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -26,6 +24,10 @@ public class Book extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @JsonIgnore // to ignore direct serialization from enum value
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User borrowedBy;
 
     @JsonProperty("category") // handles input case sensitivity for Json values
     public void setCategoryFromString(String category) {

@@ -10,25 +10,27 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
-public class LibraryService implements BookService {
+public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
 
     private final MapperUtil mapperUtil;
 
-    public LibraryService(BookRepository bookRepository, MapperUtil mapperUtil) {
+    public BookServiceImpl(BookRepository bookRepository, MapperUtil mapperUtil) {
         this.bookRepository = bookRepository;
         this.mapperUtil = mapperUtil;
     }
 
 
-    public Book addBook(BookDTO bookDTO) {
+    public void addBook(BookDTO bookDTO) {
         if (bookDTO.getTitle().trim().isEmpty() || bookDTO.getAuthor().trim().isEmpty()) {
             throw new IllegalArgumentException("Book title or author cannot be empty");
         }
-        return bookRepository.save(mapperUtil.convert(bookDTO, Book.class));
+        bookRepository.save(mapperUtil.convert(bookDTO, Book.class));
     }
 
     public void removeBook(Long bookId) {
@@ -74,6 +76,14 @@ public class LibraryService implements BookService {
         if (category == null || category.trim().isEmpty()) throw new IllegalArgumentException("Category cannot be null or empty");
         if (!Arrays.stream(Category.values()).anyMatch(value -> value.name().equalsIgnoreCase(category))) throw new IllegalArgumentException("Category does not exist");
         return bookRepository.findByCategory(Category.valueOf(category.toUpperCase()));
+    }
+
+    @Override
+    public List<Book> getAvailableBooks() {
+        return bookRepository.findAll()
+                .stream()
+                .filter(book -> book.getBorrowedBy() == null)
+                .collect(Collectors.toList());
     }
 
 
