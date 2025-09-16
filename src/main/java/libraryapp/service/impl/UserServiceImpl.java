@@ -18,17 +18,16 @@ public class UserServiceImpl implements UserService {
 
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
-    private final BookServiceImpl bookServiceImpl;
     private final ModelMapper modelMapper;
 
 
-    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, BookRepository bookRepository, BookServiceImpl bookServiceImpl) {
+    public UserServiceImpl(UserRepository userRepository, ModelMapper modelMapper, BookRepository bookRepository) {
         this.userRepository = userRepository;
         this.modelMapper = modelMapper;
-        this.bookServiceImpl = bookServiceImpl;
         this.bookRepository = bookRepository;
     }
 
+    @Override
     public void addUser(UserDTO userDTO) {
         userRepository.save(modelMapper.map(userDTO, User.class));
     }
@@ -110,6 +109,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUserIdById(userId);
     }
 
+    @Override
+    public User readUserByUsername(String username) {
+        User result = userRepository.getUserByUsername(username);
+        if (result == null) {
+            throw new RuntimeException("User not found");
+        }
+        return result;
+    }
+
 /*    @Override
     public void addBookToUser(Long userId, BookDTO bookDTO) {
 
@@ -119,37 +127,6 @@ public class UserServiceImpl implements UserService {
         Book bookToAdd = modelMapper.map(bookDTO, Book.class);
         userRepository.addBorrowedBookById(userId, bookToAdd.getId());
     }*/
-
-    @Override
-    public List<Book> searchBooksByTitle(String title) {
-        return bookServiceImpl.searchByTitle(title);
-    }
-
-    @Override
-    public List<Book> searchBooksByAuthor(String author) {
-        return bookServiceImpl.searchByAuthor(author);
-    }
-
-    @Override
-    public List<Book> searchBooksByCategory(String category) {
-        return bookServiceImpl.searchByCategory(category);
-    }
-
-    @Override
-    public List<Book> readAllBooksByUserId(Long userId) {
-
-        if (!userRepository.existsById(userId)) {
-            throw new RuntimeException("User does not exist");
-        }
-
-        List<Book> borrowedBooks = userRepository.findAllBorrowedBooksByUserId(userId);
-
-        if (!borrowedBooks.isEmpty()) {
-            return borrowedBooks;
-        } else {
-            return bookServiceImpl.getAvailableBooks();
-        }
-    }
 
 }
 

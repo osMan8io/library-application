@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,7 +24,7 @@ public class BookServiceImpl implements BookService {
         this.mapperUtil = mapperUtil;
     }
 
-
+    @Override
     public void addBook(BookDTO bookDTO) {
         if (bookDTO.getTitle().trim().isEmpty() || bookDTO.getAuthor().trim().isEmpty()) {
             throw new IllegalArgumentException("Book title or author cannot be empty");
@@ -33,16 +32,19 @@ public class BookServiceImpl implements BookService {
         bookRepository.save(mapperUtil.convert(bookDTO, Book.class));
     }
 
+    @Override
     public void removeBook(Long bookId) {
         if (!bookRepository.existsById(bookId)) throw new IllegalArgumentException("Book is not exist");
         bookRepository.deleteById(bookId);
     }
 
+    @Override
     public List<Book> getAllBooks() {
         return bookRepository.findAllOrderByIdAsc();
         // returns data in ascending order
     }
 
+    @Override
     public Book updateBook(Long bookId, BookDTO bookDTO) {
         if (!bookRepository.existsById(bookId)) {
             throw new IllegalArgumentException("Book is not exist");
@@ -57,13 +59,13 @@ public class BookServiceImpl implements BookService {
         if (title == null || title.trim().isEmpty()) {
             throw new IllegalArgumentException("Title cannot be null or empty");
         }
-        return bookRepository.findAllByTitleContainingIgnoreCase(title);
+        return bookRepository.findAllByTitleIgnoreCase(title);
     }
 
     @Override
     public List<Book> searchByAuthor(String author) {
         if (author == null || author.trim().isEmpty()) throw new IllegalArgumentException("Author cannot be null or empty");
-        return bookRepository.findByAuthorContainingIgnoreCase(author.trim());
+        return bookRepository.findByAuthorIgnoreCase(author.trim());
     }
 
     @Override
@@ -84,6 +86,20 @@ public class BookServiceImpl implements BookService {
                 .stream()
                 .filter(book -> book.getBorrowedBy() == null)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Book> search(String query) {
+
+        List<Book> result;
+
+        try {
+            Category category = Category.valueOf(query.toUpperCase());
+            result = bookRepository.findByTitleOrAuthorOrCategory(query);
+        } catch (IllegalArgumentException e) {
+            result = bookRepository.findByTitleOrAuthorOrCategory(query);
+        }
+        return result;
     }
 
 

@@ -1,10 +1,8 @@
 package libraryapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import libraryapp.enums.Role;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,6 +25,9 @@ public class User extends BaseEntity {
     private String password;
     private String name;
     private String address;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @OneToMany(mappedBy = "borrowedBy", cascade = CascadeType.ALL)
     private List<Book> borrowedBooks;

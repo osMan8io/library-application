@@ -14,6 +14,7 @@ import java.util.List;
 public interface UserRepository extends JpaRepository<User, Long> {
 
     User getUserIdById(Long id);
+    User getUserByUsername(String username);
 
     @Transactional
     @Modifying // update password from app_user table to this ?2(String password) where id equals to ?1(Long id).

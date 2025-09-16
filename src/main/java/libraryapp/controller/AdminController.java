@@ -1,56 +1,56 @@
 package libraryapp.controller;
 
 import libraryapp.dto.BookDTO;
-import libraryapp.service.impl.BookServiceImpl;
+import libraryapp.service.BookService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/")
-public class BookController {
+@RequestMapping("/admin")
+public class AdminController {
 
-    private final BookServiceImpl bookServiceImpl;
+    private final BookService bookService;
 
-    public BookController(BookServiceImpl bookServiceImpl) {
-        this.bookServiceImpl = bookServiceImpl;
+    public AdminController(BookService bookService) {
+        this.bookService = bookService;
     }
 
-    @GetMapping
+    @GetMapping()
     public String retrieveAllBooks(Model model) {
-        model.addAttribute("books", bookServiceImpl.getAllBooks());
-        return "book/book-list";
+        model.addAttribute("books", bookService.getAllBooks());
+        return "admin/book-list";
     }
 
     @GetMapping("/add")
     public String addBook(Model model) {
         model.addAttribute("book", new BookDTO());
-        return "book/book-add";
+        return "admin/book-add";
     }
 
     @PostMapping("/add")
     public String addBook(BookDTO bookDTO) { // without @RequestBody can not add data via JSON.
-        bookServiceImpl.addBook(bookDTO);
-        return "redirect:/";
+        bookService.addBook(bookDTO);
+        return "redirect:/admin";
     }
 
     @GetMapping("/remove/{bookId}")
-    public String removeBook(@PathVariable Long bookId, Model model) {
-        bookServiceImpl.removeBook(bookId);
-        return "redirect:/";
+    public String removeBook(@PathVariable Long bookId) {
+        bookService.removeBook(bookId);
+        return "redirect:/admin";
     }
 
     @GetMapping("/update/{bookId}")
     public String updateBook(@PathVariable("bookId") Long bookId, Model model) {
-        model.addAttribute("book", bookServiceImpl.searchById(bookId));
-        return "book/book-edit";
+        model.addAttribute("book", bookService.searchById(bookId));
+        return "admin/book-edit";
     }
 
     @PostMapping("/update/{bookId}") // in order to update in UI side we don't have to use put mapping
     public String updateBook(@PathVariable("bookId") Long bookId, BookDTO bookDTO, Model model) {
-        bookServiceImpl.searchById(bookId);
-        model.addAttribute("book", bookServiceImpl.updateBook(bookId, bookDTO));
-        return "redirect:/";
+        bookService.searchById(bookId);
+        model.addAttribute("book", bookService.updateBook(bookId, bookDTO));
+        return "redirect:/admin";
     }
 
 /*    @GetMapping("/id/{bookId}")
